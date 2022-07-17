@@ -2,9 +2,10 @@ package com.luv2code.junitdemo;
 
 import org.junit.jupiter.api.*;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class DemoUtilsTest {
     DemoUtils demoUtils;
 
@@ -15,20 +16,62 @@ class DemoUtilsTest {
     }
 
     @Test
-    // @DisplayName("Equals and Not Equals")
-    void test_Equals_And_Not_Equals() {
+    @DisplayName("Equals and Not Equals")
+    void testEqualsAndNotEquals() {
         assertEquals(6, demoUtils.add(2, 4), "2+4 must be 6");
         assertNotEquals(6, demoUtils.add(1, 9), "1+9 must not be 6");
     }
 
     @Test
-    // @DisplayName("Null and Not Null")
-    void test_Null_And_Not_Null() {
+    @DisplayName("Null and Not Null")
+    void testNullAndNotNull() {
         String str1 = null;
         String str2 = "luv2code";
 
         assertNull(demoUtils.checkNull(str1), "Object should be null");
         assertNotNull(demoUtils.checkNull(str2), "Object should not null");
+    }
+
+    @Test
+    @DisplayName("Same and Not Same")
+    void testSameAndNotSame() {
+        String str = "luv2code";
+
+        assertSame(demoUtils.getAcademy(), demoUtils.getAcademyDuplicate());
+        assertNotSame(str, demoUtils.getAcademy());
+    }
+
+    @Test
+    @DisplayName("True and False")
+    void testTrueFalse() {
+        int gradeOne = 10;
+        int gradeTwo = 5;
+
+        assertTrue(demoUtils.isGreater(gradeOne, gradeTwo), "This should return true");
+        assertFalse(demoUtils.isGreater(gradeTwo, gradeOne), "This should return false");
+    }
+
+    @Test
+    @DisplayName("Array Equals")
+    void testArrayEquals() {
+        String[] stringArray = {"A", "B", "C"};
+
+        assertArrayEquals(stringArray, demoUtils.getFirstThreeLettersOfAlphabet(), "Arrays should be the same");
+    }
+
+    @Test
+    @DisplayName("Iterable equals")
+    void testIterableEquals() {
+        List<String> theList = List.of("luv", "2", "code");
+        assertIterableEquals(theList, demoUtils.getAcademyInList(), "Expected list should be same");
+    }
+
+    @Test
+    @DisplayName("Lines match")
+    void testLinesMatch() {
+        List<String> theList = List.of("luv", "2", "code");
+
+        assertLinesMatch(theList, demoUtils.getAcademyInList(), "Lines should match");
     }
 
 //    @AfterEach
