@@ -26,6 +26,9 @@ public class GradebookController {
     @PostMapping(value="/")
     public String createStudent(@ModelAttribute("student") CollegeStudent student, Model m) {
         studentService.createStudent(student.getFirstname(), student.getLastname(), student.getEmailAddress());
+
+        Iterable<CollegeStudent> collegeStudents = studentService.getGradebook();
+        m.addAttribute("students", collegeStudents);
         return "index";
     }
 
