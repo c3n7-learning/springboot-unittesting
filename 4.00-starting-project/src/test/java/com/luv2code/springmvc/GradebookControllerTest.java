@@ -1,11 +1,14 @@
 package com.luv2code.springmvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.luv2code.springmvc.models.CollegeStudent;
 import com.luv2code.springmvc.repository.HistoryGradesDao;
 import com.luv2code.springmvc.repository.MathGradesDao;
 import com.luv2code.springmvc.repository.ScienceGradesDao;
 import com.luv2code.springmvc.repository.StudentDao;
 import com.luv2code.springmvc.service.StudentAndGradeService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -13,13 +16,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @TestPropertySource("/application-test.properties")
 @AutoConfigureMockMvc
@@ -34,6 +45,14 @@ public class GradebookControllerTest {
     @Mock
     StudentAndGradeService studentCreateServiceMock;
 
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
+    private CollegeStudent student;
 
     @Autowired
     private JdbcTemplate jdbc;
@@ -77,6 +96,16 @@ public class GradebookControllerTest {
     @Value("${sql.script.delete.history.grade}")
     private String sqlDeleteHistoryGrade;
 
+    public static final MediaType APPLICATION_JSON_UTF8 = MediaType.APPLICATION_JSON;
+
+    @BeforeAll
+    public static void setup() {
+        request = new MockHttpServletRequest();
+
+        request.setParameter("firstname", "Chad");
+        request.setParameter("lastname", "Darby");
+        request.setParameter("emailAddress", "chad.darby@c3n7.tech");
+    }
 
     @BeforeEach
     public void setupDatabase() {
@@ -88,11 +117,35 @@ public class GradebookControllerTest {
 
 
     @Test
-    public void placeholder() {
+    public void getStudentHttpRequest() throws Exception {
 
+        student.setFirstname("Chad");
+        student.setLastname("Darby");
+        student.setEmailAddress("chad.darby@c3n7.tech");
+        entityManager.persist(student);
+        entityManager.flush();
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$", hasSize(2)));
     }
 
+    @Test
+    public void createStudentHttpRequest() throws Exception {
+        student.setFirstname("Chad");
+        student.setFirstname("Darby");
+        student.setEmailAddress("chad_darby@c3n7.tech");
 
+        mockMvc.perform(post("/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(student)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)));
+
+        CollegeStudent student = studentDao.findByEmailAddress("chad_darby@c3n7.tech");
+        assertNotNull(student, "Student should be valid.");
+    }
 
     @AfterEach
     public void setupAfterTransaction() {
