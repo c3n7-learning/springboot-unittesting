@@ -157,9 +157,9 @@ public class StudentAndGradeService {
         List<Grade> mathGradesList = new ArrayList<>();
         mathGrades.forEach(mathGradesList::add);
         List<Grade> historyGradesList = new ArrayList<>();
-        scienceGrade.forEach(historyGradesList::add);
+        historyGrade.forEach(historyGradesList::add);
         List<Grade> scienceGradesList = new ArrayList<>();
-        historyGrade.forEach(scienceGradesList::add);
+        scienceGrade.forEach(scienceGradesList::add);
 
         studentGrades.setMathGradeResults(mathGradesList);
         studentGrades.setScienceGradeResults(scienceGradesList);
