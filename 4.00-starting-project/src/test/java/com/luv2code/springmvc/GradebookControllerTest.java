@@ -26,6 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.swing.text.html.Option;
+
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -165,6 +168,33 @@ public class GradebookControllerTest {
         assertFalse(studentDao.findById(0).isPresent());
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/student/{id}", 0))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.status", is(404)))
+                .andExpect(jsonPath("$.message", is("Student or Grade was not found")));
+    }
+
+    @Test
+    public void studentInformationHttpRequest() throws Exception {
+        Optional<CollegeStudent> student = studentDao.findById(1);
+
+        assertTrue(student.isPresent());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/studentInformation/{id}", 1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.firstname", is("Eric")))
+                .andExpect(jsonPath("$.lastname", is("Roby")))
+                .andExpect(jsonPath("$.emailAddress", is("eric.roby@luv2code_school.com")));
+    }
+
+    @Test
+    public void studentInformationHttpRequestEmptyResponse() throws Exception {
+        Optional<CollegeStudent> student = studentDao.findById(0);
+
+        assertFalse(student.isPresent());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/studentInformation/{id}", 0))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.status", is(404)))
                 .andExpect(jsonPath("$.message", is("Student or Grade was not found")));
