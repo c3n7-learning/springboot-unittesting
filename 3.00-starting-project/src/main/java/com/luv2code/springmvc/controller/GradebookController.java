@@ -62,6 +62,7 @@ public class GradebookController {
                               @RequestParam("gradeType") String gradeType,
                               @RequestParam("studentId") int studentId,
                               Model m) {
+
         if(!studentService.checkIfStudentIsNull(studentId)) {
             return "error";
         }
